@@ -22,11 +22,13 @@ from inventory.api_views import ItemViewSet, GroceryViewSet, ProduceViewSet, Ven
 from register.api_views import ShiftViewSet, TransactionViewSet, LineItemViewSet, TenderViewSet
 
 # Uncomment the next two lines to enable the admin:
-# from django.contrib import admin
-# admin.autodiscover()
+from django.contrib import admin
+admin.autodiscover()
 
 urlpatterns = patterns(
     '',
+    url(r'^grappelli/', include('grappelli.urls')), # grappelli URLS
+    url(r'^admin/', include(admin.site.urls)), # admin site
     url(r'^register/', include('register.urls')),
     url(r'^inventory/', include('inventory.urls')),
 )

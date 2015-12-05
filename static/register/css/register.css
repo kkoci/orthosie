@@ -1,0 +1,109 @@
+/*
+    Copyright 2013 Jack David Baucum
+
+    This file is part of Orthosie.
+
+    Orthosie is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Orthosie is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Orthosie.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#input {
+  border: 1px solid;
+  height: 40px;
+}
+
+#transactions {
+  width: 70%;
+  height: 75%;
+  border: solid 2px;
+  margin-top: 5px;
+  position: fixed;
+  display: inline;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+#transactions > table {
+  width: 100%;
+  margin: 5px;
+}
+
+#product_search {
+  width: 70%;
+  height: 75%;
+  border: solid 2px;
+  margin-top: 5px;
+  position: fixed;
+  display: inline;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+#product_search > table {
+  width: 100%;
+  margin: 5px;
+  cursor: pointer;
+}
+
+#numpad {
+  float: right;
+  width: 25%;
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+#numpad_enter {
+  font-size: 2.5em !important;
+  cursor: pointer;
+}
+
+.numpad_sm {
+  font-size: 3em;
+  cursor: pointer;
+}
+
+#totals {
+  position: fixed;
+  bottom: 0;
+}
+
+.total_header {
+  display: inline;
+  font-size: 2.5em;
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.total_value {
+  font-size: 2em;
+  margin-right: 10px;
+}
+
+#tender {
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+#ringtype-upc {
+  display: none;
+}
+
+.void-line {
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: pointer;
+}

@@ -9,13 +9,15 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 INSTALLED_APPS = (
+    'grappelli',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django.contrib.sites',
+    #'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django.contrib.admin',
     'register',
     'inventory'
 )
@@ -34,6 +36,18 @@ ROOT_URLCONF = 'orthosie.urls'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
+    #'django.contrib.auth.context_processors.auth', 
+    #'django.contrib.messages.context_processors.messages',
+)
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.core.context_processors.request',
+    'django.contrib.auth.context_processors.auth', 
+    'django.contrib.messages.context_processors.messages',
+)
+
+STATIC_ROOT = (
+    "/home/kkoci/python_examples/orthosie/static/"
 )
 
 TEMPLATE_DIRS = (
@@ -69,9 +83,9 @@ ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
 
-STATICFILES_DIRS = (
-    os.path.join(os.path.dirname(__file__), '../static').replace('\\', '/'),
-)
+#STATICFILES_DIRS = (
+    #os.path.join(os.path.dirname(__file__), '../static').replace('\\', '/'),
+#)
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
