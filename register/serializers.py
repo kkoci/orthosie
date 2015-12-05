@@ -15,20 +15,36 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Orthosie.  If not, see <http://www.gnu.org/licenses/>.
 
-from register.models import Shift, Transaction, LineItem
+from register.models import Shift, Transaction, LineItem, Tender, TransactionTotal
 from rest_framework import serializers
 
 
 class ShiftSerializer(serializers.HyperlinkedModelSerializer):
+
     class Meta:
         model = Shift
 
 
 class TransactionSerializer(serializers.HyperlinkedModelSerializer):
+
     class Meta:
         model = Transaction
 
 
 class LineItemSerializer(serializers.HyperlinkedModelSerializer):
+
     class Meta:
         model = LineItem
+
+
+class TenderSerializer(serializers.HyperlinkedModelSerializer):
+
+    class Meta:
+        model = Tender
+
+
+class TransactionTotalSerializer(serializers.Serializer):
+
+    class Meta:
+        model = TransactionTotal
+

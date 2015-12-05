@@ -1,9 +1,10 @@
-require(['/static/js/config.js'], function (config) {
+require(['/static/js/config.js'], function () {
   require(['jquery', 'bootstrap'], function($) {
     var input_mode = 'upc';
 
     document.ready = function () {
-      $('#transactions').scrollTop($("#transactions")[0].scrollHeight);
+      var transactions = $('#transactions');
+      transactions.scrollTop(transactions[0].scrollHeight);
     };
     document.onkeypress = function(e) {
       if (e.keyCode == 13) {
@@ -58,7 +59,8 @@ require(['/static/js/config.js'], function (config) {
     });
 
     function backspace() {
-      $('#register_input').html($('#register_input').html().substring(0, $('#register_input').html().length - 1));
+      var register_input = $('#register_input');
+      register_input.html(register_input.html().substring(0, register_input.html().length - 1));
     }
 
     function append(key) {
@@ -66,76 +68,74 @@ require(['/static/js/config.js'], function (config) {
     }
 
     function submit() {
+      var register_input = $('#register_input'),
+        csrf_token_input = $('#csrf_token').find('input'),
+        transactions = $('#transactions'),
+        transaction_id = $('#input').data('transaction-id');
       switch (input_mode) {
         case 'upc':
-          post_args = {
-            upc: $('#register_input').html(),
+          var post_args = {
+            upc: register_input.html(),
             quantity: 1
           };
-          post_args[$('#csrf_token>input').attr('name')] = $('#csrf_token>input').attr('value');
+          post_args[csrf_token_input.attr('name')] = csrf_token_input.attr('value');
           $.ajax({
-            url: '/register/process_upc/',
+            url: '/transactions/' + transaction_id + '/ring_upc/',
             data: post_args,
             type: 'POST',
-            dataType: 'json',
-            success: function(data, status) {
-              if (data.success) {
-                if ($('#transactions').data('status') == 'end') {
-                  $('#transactions>table>tbody').html('');
-                  $('#transactions').data('status', 'ring');
-                }
-                $('#transactions>table').append('<tr id="line-' + data.id + '"><td>' + data.vendor + ' ' + data.name + '</td><td>' + data.quantity + ' @ $' + data.price + '</td><td><i class="fa fa-times text-danger void-line"></i></td></tr>').click(function() {void_line(data.id);});
-                update_totals();
-                $('#transactions').scrollTop($("#transactions")[0].scrollHeight);
-              }
-              else {
-                alert(data.error);
-              }
-            },
-            error: function(xhr, text, error) {
-              alert('There was an error processing the request.');
+            dataType: 'json'
+          }).done(function(data){
+            if (transactions.data('status') == 'end') {
+              transactions.find('table').find('tbody').html('');
+              transactions.data('status', 'ring');
             }
+            var parser = document.createElement('a');
+            parser.href = data.url;
+            var id = parser.pathname.match(/[0-9]+/);
+            transactions.find('table').append('<tr id="line-' + id + '"><td>' + data.description + '</td><td>' + data.quantity + ' @ $' + data.price + '</td><td><i class="fa fa-times text-danger void-line"></i></td></tr>').click(function() {void_line(data.id);});
+            update_totals();
+            transactions.scrollTop(transactions[0].scrollHeight);
+          }).fail(function(){
+            alert('There was an error processing the request.');
           });
           break;
         case 'tender':
           post_args = {
-            tender: $('#register_input').html(),
+            tender: register_input.html(),
             quantity: 1
           };
-          post_args[$('#csrf_token>input').attr('name')] = $('#csrf_token>input').attr('value');
+          post_args[csrf_token_input.attr('name')] = csrf_token_input.attr('value');
           $.ajax({
-            url: '/register/tender_transaction/',
+            url: '/transactions/' + transaction_id + '/tender_transaction/',
             data: post_args,
             type: 'POST',
-            dataType: 'json',
-            success: function(data, status) {
-              if (data.total <= 0) {
-                $('#transactions').data('status', 'end');
-              }
-              $('#sub_total_value').html('$' + data.subtotal);
-              $('#tax_total_value').html('$' + data.taxtotal);
-              $('#paid_total_value').html('$' + data.paidtotal);
-              $('#total_value').html('$' + data.total);
-              if (data.message !== '') {
-                div = document.createElement('div');
-                div.innerHTML = data.message;
-                alert(div.firstChild.nodeValue);
-              }
-            },
-            error: function(xhr, text, error) {
-              alert('There was an error processing the request.');
+            dataType: 'json'
+          }).done(function(data){
+            if (data.total <= 0) {
+              transactions.data('status', 'end');
             }
+            $('#sub_total_value').html('$' + data.subtotal);
+            $('#tax_total_value').html('$' + data.taxtotal);
+            $('#paid_total_value').html('$' + data.paidtotal);
+            $('#total_value').html('$' + data.total);
+            if (data.message !== '') {
+              var div = document.createElement('div');
+              div.innerHTML = data.message;
+              alert(div.firstChild.nodeValue);
+            }
+          }).fail(function(){
+            alert('There was an error processing the request.');
           });
           break;
         case 'product-search':
-          product_search($('#register_input').html());
+          product_search(register_input.html());
           break;
       }
-      $('#register_input').html('');
+      register_input.html('');
     }
 
     function product_search(search) {
-      $('#product_search').load('/register/product_search/?search=' + search + '&csrfmiddlewaretoken=' + $('#csrf_token>input').attr('value'), function() {
+      $('#product_search').load('/register/product_search/?search=' + search + '&csrfmiddlewaretoken=' + $('#csrf_token').find('input').attr('value'), function() {
           $('#transactions').addClass('hidden');
           $('#product_search').removeClass('hidden');
           $('.grocery-search-result').each(function() {
@@ -155,41 +155,40 @@ require(['/static/js/config.js'], function (config) {
     }
 
     function void_line(id) {
-      post_args = {
-        id: id
-      };
-      post_args[$('#csrf_token>input').attr('name')] = $('#csrf_token>input').attr('value');
+      var csrf_token_input = $('#csrf_token').find('input'),
+        post_args = {
+          id: id
+        };
+      post_args[csrf_token_input.attr('name')] = csrf_token_input.attr('value');
       $.ajax({
-        url: '/register/cancel_line/',
+        url: '/line-items/' + id + '/cancel/',
         data: post_args,
         type: 'POST',
-        dataType: 'json',
-        success: function(data, status) {
-          $('#line-' + id).addClass('danger');
-          $('#line-' + id + ' td:nth-child(3)').html('');
-          update_totals();
-        }
+        dataType: 'json'
+      }).done(function(){
+        $('#line-' + id).addClass('danger');
+        $('#line-' + id + ' td:nth-child(3)').html('');
+        update_totals();
       });
     }
 
     function update_totals() {
       $.ajax({
-        url: '/register/transaction_total',
-        dataType: 'json',
-        success: function(data) {
-          $('#sub_total_value').html('$' + data.subtotal);
-          $('#tax_total_value').html('$' + data.taxtotal);
-          $('#paid_total_value').html('$' + data.paidtotal);
-          $('#total_value').html('$' + data.total);
-        }
+        url: '/transactions/' + $('#input').data('transaction-id') + '/get_totals/',
+        dataType: 'json'
+      }).done(function(){
+        $('#sub_total_value').html('$' + data.sub_total);
+        $('#tax_total_value').html('$' + data.tax_total);
+        $('#paid_total_value').html('$' + data.paid_total);
+        $('#total_value').html('$' + data.total);
       });
     }
 
     function set_inputtype(type) {
-      var Type = $('#ringtype-' + type + ' > a').html();
-      var header = $('#ringtype > button');
-      var selected = $('#ringtype-' + type);
-      var foo = $('#ringtype-' + header.attr('data-ringtype'));
+      var Type = $('#ringtype-' + type + ' > a').html(),
+        header = $('#ringtype').find('button'),
+        selected = $('#ringtype-' + type),
+        foo = $('#ringtype-' + header.attr('data-ringtype'));
 
       $(header.children()[0]).html(Type);
       selected.css('display', 'none');
@@ -200,30 +199,28 @@ require(['/static/js/config.js'], function (config) {
 
     function end_shift() {
       $.ajax({
-        url: '/register/end_shift/',
-        dataType: 'json',
-        success: function(data, status) {
-          $('#confirm_endshift > div').modal('hide');
-        },
-        error: function(xhr, text, error) {
-          alert('An error was encountered while trying to end the shift.');
-        }
+        url: '/shifts/'+ $('#input').data('shift-id') + '/end/',
+        type: 'post',
+        dataType: 'json'
+      }).done(function(){
+        $('#confirm_endshift').find('div').modal('hide');
+      }).fail(function(){
+        alert('An error was encountered while trying to end the shift.');
       });
     }
 
     function cancel_transaction() {
       $.ajax({
-        url: '/register/cancel_transaction/',
-        dataType: 'json',
-        success: function(data, status) {
-          $('#confirm_cancel_transaction > div').modal('hide');
-          $('#transactions').data('status', 'end');
-          $('#transactions>table>tbody>tr').remove();
-          update_totals();
-        },
-        error: function(xhr, text, error) {
-          alert('An error was encountered while trying to cancel this transaction.');
-        }
+        url: '/transactions/' + $('#input').data('transaction-id') + '/cancel/',
+        type: 'post',
+        dataType: 'json'
+      }).done(function(){
+        $('#confirm_cancel_transaction').find('div').modal('hide');
+        $('#transactions').data('status', 'end');
+        $('#transactions'.find('table').find('tbody').find('tr')).remove();
+        update_totals();
+      }).fail(function(){
+        alert('An error was encountered while trying to cancel this transaction.');
       });
     }
 

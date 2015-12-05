@@ -1,4 +1,4 @@
-require(['/static/js/config.js'], function (config) {
+require(['/static/js/config.js'], function () {
   require(['jquery', 'bootstrap'], function($) {
 
     $('.vendor-name').click(function() {
@@ -70,8 +70,9 @@ require(['/static/js/config.js'], function (config) {
     });
 
     function edit_vendor(upc) {
-      if ($('#' + upc + '_vendor > input').length === 0) {
-        $('#' + upc + '_vendor').html("<input type='text' id='" + upc + "_vendor_edit' class='grocery-vendor-edit' value='" + $('#' + upc + '_vendor').html() + "'>");
+      var upc_vendor = $('#' + upc + '_vendor');
+      if (upc_vendor.find('input').length === 0) {
+        upc_vendor.html('<input type="text" id="' + upc + '_vendor_edit" class="grocery-edit grocery-vendor-edit" value="' + upc_vendor.html() + '">');
         $('#' + upc + '_vendor_edit').focus().blur(function() {
           save_vendor(upc);
         });
@@ -79,20 +80,16 @@ require(['/static/js/config.js'], function (config) {
     }
 
     function save_vendor(upc) {
-      new_vendor = $('#' + upc + '_vendor_edit').val();
-      post_args = {
-        upc: upc,
-        vendor: new_vendor
-      };
-      post_args[$('#csrf_token>input').attr('name')] = $('#csrf_token>input').attr('value');
+      var new_vendor = $('#' + upc + '_vendor_edit').val(),
+        id = get_id_from_upc(upc);
 
       $.ajax({
-        url: '/inventory/update_grocery/',
-        data: post_args,
+        url: '/groceries/' + id + '/update_vendor/',
+        data: { vendor: new_vendor },
         type: 'POST',
         dataType: 'json',
-        success: function(data, status) {
-          $('#' + upc + '_vendor').html(data.vendor_name);
+        success: function(data) {
+          $('#' + upc + '_vendor').html(data.vendor.name);
         },
         error: function(xhr, text, error) {
           alert('There was an error processing the request.' + '\n' + text + '\n' + error);
@@ -102,8 +99,9 @@ require(['/static/js/config.js'], function (config) {
     }
 
     function edit_name(upc) {
-      if ($('#' + upc + '_name > input').length === 0) {
-        $('#' + upc + '_name').html("<input type='text' id='" + upc + "_name_edit' class='grocery-name-edit' value='" + $('#' + upc + '_name').html() + "'>");
+      var upc_name = $('#' + upc + '_name');
+      if (upc_name.find('input').length === 0) {
+        upc_name.html("<input type='text' id='" + upc + "_name_edit' class='grocery-name-edit' value='" + upc_name.html() + "'>");
         $('#' + upc + '_name_edit').focus().blur(function() {
           save_name(upc);
         });
@@ -111,19 +109,15 @@ require(['/static/js/config.js'], function (config) {
     }
 
     function save_name(upc) {
-      new_name = $('#' + upc + '_name_edit').val();
-      post_args = {
-        upc: upc,
-        name: new_name
-      };
-      post_args[$('#csrf_token>input').attr('name')] = $('#csrf_token>input').attr('value');
+      var new_name = $('#' + upc + '_name_edit').val(),
+        id = get_id_from_upc(upc);
 
       $.ajax({
-        url: '/inventory/update_grocery/',
-        data: post_args,
+        url: '/groceries/' + id + '/update_name/',
+        data: { name: new_name },
         type: 'POST',
         dataType: 'json',
-        success: function(data, status) {
+        success: function(data) {
           $('#' + upc + '_name').html(data.name);
         },
         error: function(xhr, text, error) {
@@ -135,7 +129,8 @@ require(['/static/js/config.js'], function (config) {
 
     function edit_price(upc) {
       if ($('#' + upc + '_price > input').length === 0) {
-        $('#' + upc + '_price').html("<input type='number' id='" + upc + "_price_edit' class='grocery-price-edit' value='" + $('#' + upc + '_price').html() + "'>");
+        var upc_price = $('#' + upc + '_price');
+        upc_price.html("<input type='number' id='" + upc + "_price_edit' class='grocery-price-edit' value='" + upc_price.html() + "'>");
         $('#' + upc + '_price_edit').focus().blur(function() {
           save_price(upc);
         });
@@ -143,20 +138,15 @@ require(['/static/js/config.js'], function (config) {
     }
 
     function save_price(upc) {
-      new_price = $('#' + upc + '_price_edit').val();
-
-      post_args = {
-        upc: upc,
-        price: new_price
-      };
-      post_args[$('#csrf_token>input').attr('name')] = $('#csrf_token>input').attr('value');
+      var new_price = $('#' + upc + '_price_edit').val(),
+        id = get_id_from_upc(upc);
 
       $.ajax({
-        url: '/inventory/update_grocery/',
-        data: post_args,
+        url: '/groceries/' + id + '/update_price/',
+        data: { price: new_price },
         type: 'POST',
         dataType: 'json',
-        success: function(data, status) {
+        success: function(data) {
           $('#' + upc + '_price').html(data.price);
         },
         error: function(xhr, text, error) {
@@ -167,26 +157,15 @@ require(['/static/js/config.js'], function (config) {
     }
 
     function toggle_grocery_taxable(upc) {
-      var taxable;
-      if ($('#' + upc + '_taxable').html() == 'Taxable') {
-        taxable = false;
-      }
-      else {
-        taxable = true;
-      }
-
-      post_args = {
-        upc: upc,
-        taxable: taxable
-      };
-      post_args[$('#csrf_token>input').attr('name')] = $('#csrf_token>input').attr('value');
+      var taxable = !($('#' + upc + '_taxable').html() == 'Taxable'),
+        id = get_id_from_upc(upc);
 
       $.ajax({
-        url: '/inventory/update_grocery/',
-        data: post_args,
+        url: '/groceries/' + id + '/update_taxable/',
+        data: { taxable: taxable },
         type: 'POST',
         dataType: 'json',
-        success: function(data, status) {
+        success: function(data) {
           if (data.taxable) {
             $('#' + upc + '_taxable').html('Taxable');
           }
@@ -202,26 +181,15 @@ require(['/static/js/config.js'], function (config) {
     }
 
     function toggle_grocery_scalable(upc) {
-      var scalable;
-      if ($('#' + upc + '_scalable').html() == 'Scalable') {
-        scalable = false;
-      }
-      else {
-        scalable = true;
-      }
-
-      post_args = {
-        upc: upc,
-        scalable: scalable
-      };
-      post_args[$('#csrf_token>input').attr('name')] = $('#csrf_token>input').attr('value');
+      var scalable = !($('#' + upc + '_scalable').html() == 'Scalable'),
+        id = get_id_from_upc(upc);
 
       $.ajax({
-        url: '/inventory/update_grocery/',
-        data: post_args,
+        url: '/groceries/' + id + '/update_scalable/',
+        data: { scalable: scalable },
         type: 'POST',
         dataType: 'json',
-        success: function(data, status) {
+        success: function(data) {
           if (data.scalable) {
             $('#' + upc + '_scalable').html('Scalable');
           }
@@ -237,36 +205,41 @@ require(['/static/js/config.js'], function (config) {
     }
 
     function new_grocery() {
-      if ($('#grocery > input').val() === '' || $('#grocery_vendor > input').val() === '' || $('#grocery_name > input').val() === '' || $('#grocery_price > input').val() === '') {
+      var grocery_input = $('#grocery').find('input'),
+        grocery_vendor_input = $('#grocery_vendor').find('input'),
+        grocery_name_input = $('#grocery_name').find('input'),
+        grocery_price_input = $('#grocery_price').find('input'),
+        grocery_upc_input = $('#grocery_upc').find('input');
+      if (grocery_input.val() === '' || grocery_vendor_input.val() === '' || grocery_name_input.val() === '' || grocery_price_input.val() === '') {
         return;
       }
-      else if ($('#grocery_upc :invalid').length === 1) {
+      else if (grocery_upc_input.find(':invalid').length === 1) {
         alert('Invalid UPC');
         return;
       }
 
-      var scalable, taxable;
-      scalable = $('#grocery_scalable').html() == 'Scalable';
-      taxable = $('#grocery_taxable').html() == 'Taxable';
+      var scalable = $('#grocery_scalable').html() == 'Scalable',
+        taxable = $('#grocery_taxable').html() == 'Taxable',
+        csrf_token_input = $('#csrf_token').find('input'),
+        post_args = {
+          upc: grocery_upc_input.val(),
+          vendor: grocery_vendor_input.val(),
+          name: grocery_name_input.val(),
+          price: grocery_price_input.val(),
+          scalable: scalable,
+          taxable: taxable
+        };
 
-      post_args = {
-        upc: $('#grocery_upc > input').val(),
-        vendor: $('#grocery_vendor > input').val(),
-        name: $('#grocery_name > input').val(),
-        price: $('#grocery_price > input').val(),
-        scalable: scalable,
-        taxable: taxable
-      };
-
-      post_args[$('#csrf_token>input').attr('name')] = $('#csrf_token>input').attr('value');
+      post_args[csrf_token_input.attr('name')] = csrf_token_input.attr('value');
 
       $.ajax({
-        url: '/inventory/create_grocery',
+        url: '/groceries/',
         data: post_args,
         type: 'POST',
         dataType: 'json',
-        success: function(data, status) {
-          location.reload();
+        success: function(data) {
+          console.log(data);
+          //location.reload();
         },
         error: function(xhr, text, error) {
           alert('There was an error processing the request.' + '\n' + text + '\n' + error);
@@ -274,63 +247,14 @@ require(['/static/js/config.js'], function (config) {
       });
     }
 
-    function new_produce() {
-      if ($('#produce_plu > input').val() === '' || $('#produce_name > input').val() === '' || $('#produce_price > input').val() === '') {
-        return;
-      }
-      else if ($('#produce_plu :invalid').length === 1) {
-        alert('Invalid PLU');
-        return;
-      }
-
-      var scalable, taxable;
-      scalable = $('#produce_scalable').html() == 'Scalable';
-      taxable = $('#produce_taxable').html() == 'Taxable';
-
-      post_args = {
-        plu: $('#produce_plu > input').val(),
-        name: $('#produce_name > input').val(),
-        variety: $('#produce_variety > input').val(),
-        size: $('#produce_size > input').val(),
-        botanical: $('#produce_botanical > input').val(),
-        price: $('#produce_price > input').val(),
-        scalable: scalable,
-        taxable: taxable
-      };
-
-      post_args[$('#csrf_token>input').attr('name')] = $('#csrf_token>input').attr('value');
-
-      $.ajax({
-        url: '/inventory/create_produce',
-        data: post_args,
-        type: 'POST',
-        dataType: 'json',
-        success: function(data, status) {
-            $('#produce-list tr:last').find('input').val('');
-            $('#produce-list tr:last').before(
-              '<tr id="' + data.plu + '" class="grocery-row">' +
-                '<td id="' + data.plu + '_plu" class="produce-plu form-control-static">' + data.plu + '</td>' +
-                '<td id="' + data.plu + '_name" class="form-control-static">' + data.name + '</td>' +
-                '<td id="' + data.plu + '_variety" class="form-control-static">' + data.variety + '</td>' +
-                '<td id="' + data.plu + '_size" class="form-control-static">' + data.size + '</td>' +
-                '<td id="' + data.plu + '_botanical" class="form-control-static">' + data.botanical + '</td>' +
-                '<td id="' + data.plu + '_price " class="form-control-static">' + data.price + '</td>' +
-                '<td id="' + data.upc + '_scalable" class="produce-scalable" data-upc="' + data.upc + '</td>' +
-                '<td id="' + data.upc + '_taxable" class="grocery-taxable" data-upc="' + data.upc + '</td>' +
-                '<td id="' + data.upc + '_scalable" class="grocery-scalable" data-upc="' + data.upc + '">' + (!data.scalable?'Non-':'') + 'Scalable</td>' +
-                '<td id="' + data.upc + '_taxable" class="grocery-taxable" data-upc="' + data.upc + '">' + (!data.taxable?'Non-':'') + 'Taxable</td>' +
-              '</tr>'
-            );
-        },
-        error: function(xhr, text, error) {
-          alert('There was an error processing the request.' + '\n' + text + '\n' + error);
-        }
-      });
+    function get_id_from_upc(upc) {
+      return $('#' + upc).data('id');
     }
 
     function edit_produce_name(plu) {
-      if ($('#' + plu + '_name > input').length === 0) {
-        $('#' + plu + '_name').html('<input type="text" placeholder="Name" id="' + plu + '_name_edit" class="produce-name-edit" value="' + $('#' + plu + '_name').html() + '">');
+      var plu_name = $('#' + plu + '_name');
+      if (plu_name.find('input').length === 0) {
+        plu_name.html('<input type="text" placeholder="Name" id="' + plu + '_name_edit" class="produce-name-edit" value="' + plu_name.html() + '">');
         $('#' + plu + '_name_edit').focus().blur(function() {
           save_produce_name(plu);
         });
@@ -338,20 +262,15 @@ require(['/static/js/config.js'], function (config) {
     }
 
     function save_produce_name(plu) {
-      new_name = $('#' + plu + '_name_edit').val();
-
-      post_args = {
-        plu: plu,
-        name: new_name
-      };
-      post_args[$('#csrf_token>input').attr('name')] = $('#csrf_token>input').attr('value');
+      var new_name = $('#' + plu + '_name_edit').val(),
+        id = get_id_from_plu(plu);
 
       $.ajax({
-        url: '/inventory/update_produce/',
-        data: post_args,
+        url: '/produce/' + id + '/update_name/',
+        data: { name: new_name },
         type: 'POST',
         dataType: 'json',
-        success: function(data, status) {
+        success: function(data) {
           $('#' + plu + '_name').html(data.name);
         },
         error: function(xhr, text, error) {
@@ -363,8 +282,9 @@ require(['/static/js/config.js'], function (config) {
     }
 
     function edit_produce_variety(plu) {
-      if ($('#' + plu + '_variety > input').length === 0) {
-        $('#' + plu + '_variety').html('<input type="text" placeholder="Variety" id="' + plu + '_variety_edit" class="produce-variety-edit" value="' + $('#' + plu + '_variety').html() + '">');
+      var plu_variety = $('#' + plu + '_variety');
+      if (plu_variety.find('input').length === 0) {
+        plu_variety.html('<input type="text" placeholder="Variety" id="' + plu + '_variety_edit" class="produce-variety-edit" value="' + plu_variety.html() + '">');
         $('#' + plu + '_variety_edit').focus().blur(function() {
           save_produce_variety(plu);
         });
@@ -372,20 +292,15 @@ require(['/static/js/config.js'], function (config) {
     }
 
     function save_produce_variety(plu) {
-      new_variety = $('#' + plu + '_variety_edit').val();
-
-      post_args = {
-        plu: plu,
-        variety: new_variety
-      };
-      post_args[$('#csrf_token>input').attr('name')] = $('#csrf_token>input').attr('value');
+      var new_variety = $('#' + plu + '_variety_edit').val(),
+        id = get_id_from_plu(plu);
 
       $.ajax({
-        url: '/inventory/update_produce/',
-        data: post_args,
+        url: '/produce/' + id + '/update_variety/',
+        data: { variety: new_variety },
         type: 'POST',
         dataType: 'json',
-        success: function(data, status) {
+        success: function(data) {
           $('#' + plu + '_variety').html(data.variety);
         },
         error: function(xhr, text, error) {
@@ -396,8 +311,9 @@ require(['/static/js/config.js'], function (config) {
     }
 
     function edit_produce_size(plu) {
-      if ($('#' + plu + '_size > input').length === 0) {
-        $('#' + plu + '_size').html('<input type="text" placeholder="Size" id="' + plu + '_size_edit" class="produce-size-edit" value="' + $('#' + plu + '_size').html() + '">');
+      var plu_size = $('#' + plu + '_size');
+      if (plu_size.find('input').length === 0) {
+        plu_size.html('<input type="text" placeholder="Size" id="' + plu + '_size_edit" class="produce-size-edit" value="' + plu_size.html() + '">');
         $('#' + plu + '_size_edit').focus().blur(function() {
           save_produce_size(plu);
         });
@@ -405,20 +321,15 @@ require(['/static/js/config.js'], function (config) {
     }
 
     function save_produce_size(plu) {
-      new_size = $('#' + plu + '_size_edit').val();
-
-      post_args = {
-        plu: plu,
-        size: new_size
-      };
-      post_args[$('#csrf_token>input').attr('name')] = $('#csrf_token>input').attr('value');
+      var new_size = $('#' + plu + '_size_edit').val(),
+        id = get_id_from_plu(plu);
 
       $.ajax({
-        url: '/inventory/update_produce/',
-        data: post_args,
+        url: '/produce/' + id + '/update_size/',
+        data: { size: new_size },
         type: 'POST',
         dataType: 'json',
-        success: function(data, status) {
+        success: function(data) {
           $('#' + plu + '_size').html(data.size);
         },
         error: function(xhr, text, error) {
@@ -429,8 +340,9 @@ require(['/static/js/config.js'], function (config) {
     }
 
     function edit_produce_botanical(plu) {
-      if ($('#' + plu + '_botanical > input').length === 0) {
-        $('#' + plu + '_botanical').html('<input type="text" placeholder="Botanical" id="' + plu + '_botanical_edit" class="produce-botanical-edit" value="' + $('#' + plu + '_botanical').html() + '">');
+      var plu_botanical = $('#' + plu + '_botanical');
+      if (plu_botanical.find('input').length === 0) {
+        plu_botanical.html('<input type="text" placeholder="Botanical" id="' + plu + '_botanical_edit" class="produce-botanical-edit" value="' + plu_botanical.html() + '">');
         $('#' + plu + '_botanical_edit').focus().blur(function() {
           save_produce_botanical(plu);
         });
@@ -438,20 +350,15 @@ require(['/static/js/config.js'], function (config) {
     }
 
     function save_produce_botanical(plu) {
-      new_botanical = $('#' + plu + '_botanical_edit').val();
-
-      post_args = {
-        plu: plu,
-        botanical: new_botanical
-      };
-      post_args[$('#csrf_token>input').attr('name')] = $('#csrf_token>input').attr('value');
+      var new_botanical = $('#' + plu + '_botanical_edit').val(),
+        id = get_id_from_plu(plu);
 
       $.ajax({
-        url: '/inventory/update_produce/',
-        data: post_args,
+        url: '/produce/' + id + '/update_botanical/',
+        data: { botanical: new_botanical },
         type: 'POST',
         dataType: 'json',
-        success: function(data, status) {
+        success: function(data) {
           $('#' + plu + '_botanical').html(data.botanical);
         },
         error: function(xhr, text, error) {
@@ -463,8 +370,9 @@ require(['/static/js/config.js'], function (config) {
 
 
     function edit_produce_price(plu) {
-      if ($('#' + plu + '_price > input').length === 0) {
-        $('#' + plu + '_price').html('<input type="number" id="' + plu + '_price_edit" class="produce-price-edit" value="' + $('#' + plu + '_price').html() + '">');
+      var plu_price = $('#' + plu + '_price');
+      if (plu_price.find('input').length === 0) {
+        plu_price.html('<input type="number" id="' + plu + '_price_edit" class="produce-price-edit" value="' + plu_price.html() + '">');
         $('#' + plu + '_price_edit').focus().blur(function() {
           save_produce_price(plu);
         });
@@ -472,20 +380,15 @@ require(['/static/js/config.js'], function (config) {
     }
 
     function save_produce_price(plu) {
-      new_price = $('#' + plu + '_price_edit').val();
-
-      post_args = {
-        plu: plu,
-        price: new_price
-      };
-      post_args[$('#csrf_token>input').attr('name')] = $('#csrf_token>input').attr('value');
+      var new_price = $('#' + plu + '_price_edit').val(),
+        id = get_id_from_plu(plu);
 
       $.ajax({
-        url: '/inventory/update_produce/',
-        data: post_args,
+        url: '/produce/' + id + '/update_price/',
+        data: { price: new_price },
         type: 'POST',
         dataType: 'json',
-        success: function(data, status) {
+        success: function(data) {
           $('#' + plu + '_price').html(data.price);
         },
         error: function(xhr, text, error) {
@@ -497,26 +400,15 @@ require(['/static/js/config.js'], function (config) {
     }
 
     function toggle_produce_scalable(plu) {
-      var scalable;
-      if ($('#' + plu + '_scalable').html() == 'Scalable') {
-        scalable = false;
-      }
-      else {
-        scalable = true;
-      }
-
-      post_args = {
-        plu: plu,
-        scalable: scalable
-      };
-      post_args[$('#csrf_token>input').attr('name')] = $('#csrf_token>input').attr('value');
+      var scalable = !($('#' + plu + '_scalable').html() == 'Scalable'),
+        id = get_id_from_upc(plu);
 
       $.ajax({
-        url: '/inventory/update_produce/',
-        data: post_args,
+        url: '/produce/' + id + '/update_scalable/',
+        data: { scalable: scalable },
         type: 'POST',
         dataType: 'json',
-        success: function(data, status) {
+        success: function(data) {
           if (data.scalable) {
             $('#' + plu + '_scalable').html('Scalable');
           }
@@ -532,26 +424,15 @@ require(['/static/js/config.js'], function (config) {
     }
 
     function toggle_produce_taxable(plu) {
-      var taxable;
-      if ($('#' + plu + '_taxable').html() == 'Taxable') {
-        taxable = false;
-      }
-      else {
-        taxable = true;
-      }
-
-      post_args = {
-        plu: plu,
-        taxable: taxable
-      };
-      post_args[$('#csrf_token>input').attr('name')] = $('#csrf_token>input').attr('value');
+      var taxable = !($('#' + plu + '_taxable').html() == 'Taxable'),
+        id = get_id_from_upc(plu);
 
       $.ajax({
-        url: '/inventory/update_produce/',
-        data: post_args,
+        url: '/produce/' + id + '/update_taxable/',
+        data: { taxable: taxable },
         type: 'POST',
         dataType: 'json',
-        success: function(data, status) {
+        success: function(data) {
           if (data.taxable) {
             $('#' + plu + '_taxable').html('Taxable');
           }
@@ -564,6 +445,70 @@ require(['/static/js/config.js'], function (config) {
         }
       });
 
+    }
+
+    function get_id_from_plu(plu) {
+      return get_id_from_upc(plu);
+    }
+
+    function new_produce() {
+      var produce_plu_input = $('#produce_plu').find('input'),
+        produce_name_input = $('#produce_name').find('input'),
+        produce_price_input = $('#produce_price').find('input'),
+        produce_variety_input = $('#produce_variety').find('input'),
+        produce_size_input = $('#produce_size').find('input'),
+        produce_botanical_input = $('#produce_botanical').find('input');
+      if (produce_plu_input.val() === '' || produce_name_input.val() === '' || produce_price_input.val() === '') {
+        return;
+      }
+      else if (produce_plu_input.find(':invalid').length === 1) {
+        alert('Invalid PLU');
+        return;
+      }
+
+      var scalable = $('#produce_scalable').html() == 'Scalable',
+        taxable = $('#produce_taxable').html() == 'Taxable',
+        csrf_token_input = $('#csrf_token').find('input'),
+        produce_list_tr_last = $('#produce-list').find('tr:last'),
+        post_args = {
+          plu: produce_plu_input.val(),
+          name: produce_name_input.val(),
+          variety: produce_variety_input.val(),
+          size: produce_size_input.val(),
+          botanical: produce_botanical_input.val(),
+          price: produce_price_input.val(),
+          scalable: scalable,
+          taxable: taxable
+        };
+
+      post_args[csrf_token_input.attr('name')] = csrf_token_input.attr('value');
+
+      $.ajax({
+        url: '/inventory/create_produce',
+        data: post_args,
+        type: 'POST',
+        dataType: 'json',
+        success: function(data) {
+          produce_list_tr_last.find('input').val('');
+          produce_list_tr_last.before(
+            '<tr id="' + data.plu + '" class="grocery-row">' +
+            '<td id="' + data.plu + '_plu" class="produce-plu form-control-static">' + data.plu + '</td>' +
+            '<td id="' + data.plu + '_name" class="form-control-static">' + data.name + '</td>' +
+            '<td id="' + data.plu + '_variety" class="form-control-static">' + data.variety + '</td>' +
+            '<td id="' + data.plu + '_size" class="form-control-static">' + data.size + '</td>' +
+            '<td id="' + data.plu + '_botanical" class="form-control-static">' + data.botanical + '</td>' +
+            '<td id="' + data.plu + '_price " class="form-control-static">' + data.price + '</td>' +
+            '<td id="' + data.upc + '_scalable" class="produce-scalable" data-upc="' + data.upc + '</td>' +
+            '<td id="' + data.upc + '_taxable" class="grocery-taxable" data-upc="' + data.upc + '</td>' +
+            '<td id="' + data.upc + '_scalable" class="grocery-scalable" data-upc="' + data.upc + '">' + (!data.scalable?'Non-':'') + 'Scalable</td>' +
+            '<td id="' + data.upc + '_taxable" class="grocery-taxable" data-upc="' + data.upc + '">' + (!data.taxable?'Non-':'') + 'Taxable</td>' +
+            '</tr>'
+          );
+        },
+        error: function(xhr, text, error) {
+          alert('There was an error processing the request.' + '\n' + text + '\n' + error);
+        }
+      });
     }
 
   });

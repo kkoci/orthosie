@@ -66,7 +66,7 @@ class Shift(models.Model):
 
     def print_z_report(self):
         z = ZReport(self)
-        z.print()
+        z.print_out()
 
     class Meta:
         ordering = ['begin_date']
@@ -101,7 +101,7 @@ class Transaction(models.Model):
 
     def print_receipt(self):
         r = Receipt(self)
-        r.print()
+        r.print_out()
 
     def create_line_item(self, item, quantity, scale=None):
         if self.finish_date is None:
@@ -185,6 +185,7 @@ class Tender(models.Model):
 
 
 class TransactionTotal():
+
     def __init__(self, sub_total, tax_total, paid_total):
         self.sub_total = sub_total
         self.tax_total = tax_total
@@ -193,6 +194,7 @@ class TransactionTotal():
 
 
 class ShiftTotal():
+
     def __init__(self, sub_total, tax_total, total, transaction_count):
         self.sub_total = sub_total
         self.tax_total = tax_total
@@ -201,6 +203,7 @@ class ShiftTotal():
 
 
 class Receipt():
+
     def __init__(self, transaction, lines=None):
         self.transaction = transaction
         self.header = settings.RECEIPT_HEADER
@@ -209,7 +212,7 @@ class Receipt():
         self.printer = Printer(settings.PRINTER)
         self.printer.open()
 
-    def print(self):
+    def print_out(self):
         self.print_header()
         self.print_body()
         self.print_footer()
@@ -242,24 +245,30 @@ class Receipt():
         )
         self.printer.print_line(
             'Total: ' + "{:19,.2f}".format(trans_totals.sub_total +
-            trans_totals.tax_total) + ' Change: ' +
-            "{:20,.2f}".format(trans_totals.total) + '\n\n'
+                                           trans_totals.tax_total) +
+            ' Change: ' +
+            "{:20,.2f}".format(
+                trans_totals.total) +
+            '\n\n'
         )
 
 
 class ZReport():
+
     def __init__(self, shift):
         self.shift = shift
         self.printer = Printer(settings.PRINTER)
         self.printer.open()
 
-    def print(self):
+    def print_out(self):
         totals = self.shift.get_totals()
         self.printer.print_line(
             'Transactions: ' + str(totals.transaction_count) + '\n'
         )
-        self.printer.print_line('SubTotal:     ' + str(totals.sub_total) + '\n')
-        self.printer.print_line('TaxTotal:     ' + str(totals.tax_total) + '\n')
+        self.printer.print_line(
+            'SubTotal:     ' + str(totals.sub_total) + '\n')
+        self.printer.print_line(
+            'TaxTotal:     ' + str(totals.tax_total) + '\n')
         self.printer.print_line('Total:        ' + str(totals.total) + '\n')
         self.printer.kick_drawer()
         self.printer.cut()
@@ -267,6 +276,7 @@ class ZReport():
 
 
 class Printer():
+
     def __init__(self, spool):
         self.spool = spool
 
@@ -294,8 +304,11 @@ class Printer():
             chr(27) + chr(112) + chr(0) + chr(48) + '0' + chr(10)
         )
 
+
 class PrinterNotFound(Exception):
+
     def __init__(self, value):
         self.value = value
+
     def __str__(self):
         return self.value
