@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Grocery',
             fields=[
-                ('item_ptr', models.OneToOneField(serialize=False, to='inventory.Item', parent_link=True, primary_key=True, auto_created=True)),
+                ('item_ptr', models.OneToOneField(serialize=False, to='inventory.Item', on_delete=models.CASCADE, parent_link=True, primary_key=True, auto_created=True)),
                 ('upc', models.CharField(unique=True, max_length=30)),
             ],
             options={
@@ -37,7 +37,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Produce',
             fields=[
-                ('item_ptr', models.OneToOneField(serialize=False, to='inventory.Item', parent_link=True, primary_key=True, auto_created=True)),
+                ('item_ptr', models.OneToOneField(serialize=False, to='inventory.Item', on_delete=models.CASCADE, parent_link=True, primary_key=True, auto_created=True)),
                 ('plu', models.IntegerField(unique=True, max_length=5)),
                 ('variety', models.CharField(max_length=100)),
                 ('size', models.CharField(null=True, max_length=30)),
@@ -61,7 +61,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='grocery',
             name='vendor',
-            field=models.ForeignKey(null=True, default=None, blank=True, to='inventory.Vendor'),
+            field=models.ForeignKey(null=True, default=None, blank=True, to='inventory.Vendor', on_delete=models.CASCADE),
             preserve_default=True,
         ),
     ]

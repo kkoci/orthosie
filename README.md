@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/maxolasersquad/orthosie.svg?branch=master)](https://travis-ci.org/maxolasersquad/orthosie)
 License
 =======
 
@@ -23,7 +24,7 @@ Orthosie is licensed under the GPLv3. The details of this license can be viewed 
 About
 =====
 Orthosie is a point of sale system written in Python using the Django framework.
-Orthosie supports Python 3 and Django 1.8.
+Orthosie supports Python 3 and Django 1.10
 
 Supported Systems
 =================
@@ -35,7 +36,7 @@ These instructions are for debian-based versions of GNU/Linux. It is recommended
 
 Required Packages
 -----------------
-    sudo apt-get install python3 python3-setuptools git 
+    sudo apt-get install python3 python3-pip python3-setuptools git 
 
 VirtualEnvWrapper
 -----------------
@@ -46,26 +47,33 @@ Add the following to your shell init script. e.g. ~/.bashrc or ~/.zshrc
     export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
     export WORKON_HOME=~/virtualenvs
 
+[Initialize virtualwrapper](http://virtualenvwrapper.readthedocs.io/en/latest/index.html#introduction)
+
+    source /usr/local/bin/virtualenvwrapper.sh
+    
 Create a virtual environment for Orthosie.
 
     mkvirtualenv orthosie
-
-Pip Packages
-------------
-    pip install -r requirements.txt
 
 Orthosie
 --------
     cd ~
     git clone https://github.com/maxolasersquad/orthosie.git
 
+Pip Packages
+------------
+    cd orthosie
+    pip install -r requirements/common.txt
+    pip install -r requirements/dev.txt
+    pip install -r requirements/prod.txt
+
 SQLite Database
 ---------------
 Getting Orthosie running for the first time requires we setup the sqlite database file.
-If you have a different database you want to use, refer to the django documentation at https://docs.djangoproject.com/en/1.6/ref/databases/
+If you have a different database you want to use, refer to the django documentation at https://docs.djangoproject.com/en/1.10/ref/databases/
 
-    cd orthosie
-    python3 manage.py syncdb
+    python3 manage.py makemigrations
+    python3 manage.py migrate
 
 Running
 =======
@@ -110,3 +118,7 @@ Licensed MIT. More information at https://github.com/twbs/bootstrap/blob/master/
 
 ## jQuery
 Licenses MIT. More information at https://jquery.org/license/
+
+Chat
+==============
+[![Join the chat at https://gitter.im/maxolasersquad/orthosie](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/maxolasersquad/orthosie?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)

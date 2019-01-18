@@ -23,28 +23,32 @@ class ShiftSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Shift
+        fields = '__all__'
 
 
 class TransactionSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Transaction
+        fields = '__all__'
 
 
 class LineItemSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = LineItem
+        fields = '__all__'
 
 
 class TenderSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Tender
+        fields = '__all__'
 
 
 class TransactionTotalSerializer(serializers.Serializer):
 
     class Meta:
         model = TransactionTotal
-
+        fields = '__all__'

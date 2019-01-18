@@ -44,7 +44,7 @@ class ShiftTest(TestCase):
         self.assertIsNotNone(transaction)
 
     def test_cannot_create_transaction_on_ended_shift(self):
-        transaction = self.shift.create_transaction()
+        self.shift.create_transaction()
         self.shift.end_shift()
         transaction = self.shift.create_transaction()
         self.assertIsNone(transaction)
@@ -84,7 +84,7 @@ class TransactionTest(TestCase):
         self.assertIsNotNone(line_item)
 
     def test_cannot_create_line_item_on_ended_transaction(self):
-        line_item = self.transaction.create_line_item(self.grocery, 1)
+        self.transaction.create_line_item(self.grocery, 1)
         self.transaction.end_transaction()
         line_item = self.transaction.create_line_item(self.grocery, 1)
         self.assertIsNone(line_item)
@@ -111,6 +111,7 @@ class TransactionTest(TestCase):
     def test_transaction_totals_with_canceled_item(self):
         self.transaction.create_line_item(self.grocery, 1)
         self.transaction.create_line_item(self.grocery, 1).cancel()
+        transaction_total = self.transaction.get_totals()
         self.assertEqual(transaction_total.total, Decimal('50.18'))
         self.assertEqual(transaction_total.tax_total, Decimal('3.28'))
         self.assertEqual(transaction_total.total, Decimal('50.18'))
