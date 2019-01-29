@@ -1,5 +1,3 @@
-#    Copyright 2013 Jack David Baucum
-#
 #    This file is part of Orthosie.
 #
 #    Orthosie is free software: you can redistribute it and/or modify
