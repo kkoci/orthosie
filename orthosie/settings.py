@@ -17,10 +17,12 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'rest_framework',
     'register',
-    'inventory'
+    'inventory',
+    'corsheaders',
 )
 
 MIDDLEWARE_CLASSES = (
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -123,3 +125,7 @@ CACHES = {
 }
 
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+
+CORS_ORIGIN_WHITELIST = (
+     'localhost:3000/'
+ )
