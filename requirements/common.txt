@@ -1,3 +1,4 @@
 Django>=1.10
 djangorestframework
 python-memcached
+django-cors-headers==2.4.0
