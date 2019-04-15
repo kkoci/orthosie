@@ -2,7 +2,7 @@
 License
 =======
 
-    Copyright 2013 Jack David Baucum
+    Copyright 2013 Jack David Baucum - Kristian Koci contributions
 
     This file is part of Orthosie.
 
@@ -59,6 +59,8 @@ Orthosie
 --------
     cd ~
     git clone https://github.com/maxolasersquad/orthosie.git
+    or
+    git clone https://github.com/kkoci/orthosie.git
 
 Pip Packages
 ------------
